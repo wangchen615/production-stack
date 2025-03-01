@@ -17,5 +17,13 @@ type: application
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
 version: 0.1.0
 
+keywords:
+  - vllm
+  - lora
+  - adapter
+home: https://github.com/vllm-project/production-stack
+sources:
+  - https://github.com/vllm-project/production-stack
+
 maintainers:
   - name: apostac
