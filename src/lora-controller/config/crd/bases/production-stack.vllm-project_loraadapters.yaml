@@ -1,0 +1,96 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: loraadapters.production-stack.vllm.ai
+spec:
+  group: production-stack.vllm.ai
+  names:
+    kind: LoraAdapter
+    listKind: LoraAdapterList
+    plural: loraadapters
+    singular: loraadapter
+    shortNames:
+      - lora
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - baseModel
+                - adapterSource
+                - deploymentConfig
+              properties:
+                baseModel:
+                  type: string
+                  description: "The name of the base model this adapter is for"
+                adapterSource:
+                  type: object
+                  required:
+                    - type
+                    - repository
+                  properties:
+                    type:
+                      type: string
+                      enum: ["huggingface", "s3", "local"]
+                    repository:
+                      type: string
+                credentialsSecretRef:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                deploymentConfig:
+                  type: object
+                  required:
+                    - algorithm
+                    - podSelector
+                  properties:
+                    algorithm:
+                      type: string
+                      enum: ["default", "ordered", "equalized"]
+                    podSelector:
+                      type: object
+                      properties:
+                        matchLabels:
+                          type: object
+                          additionalProperties:
+                            type: string
+            status:
+              type: object
+              properties:
+                phase:
+                  type: string
+                  enum: ["Ready", "Loading", "Failed", "Partial"]
+                loadedAdapters:
+                  type: array
+                  items:
+                    type: string
+                failedAdapters:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      reason:
+                        type: string
+                podAssignments:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      pod:
+                        type: string
+                      adapters:
+                        type: array
+                        items:
+                          type: string
+      subresources:
+        status: {} 

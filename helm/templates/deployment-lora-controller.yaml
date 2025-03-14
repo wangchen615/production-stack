@@ -1,0 +1,39 @@
+{{- if .Values.loraController.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lora-controller
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: lora-controller
+    {{- include "lora-controller.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.loraController.replicaCount }}
+  selector:
+    matchLabels:
+      app: lora-controller
+  template:
+    metadata:
+      labels:
+        app: lora-controller
+    spec:
+      serviceAccountName: lora-controller
+      containers:
+        - name: controller
+          image: "{{ .Values.loraController.image.repository }}:{{ .Values.loraController.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.loraController.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.loraController.resources | nindent 12 }}
+      {{- with .Values.loraController.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.loraController.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.loraController.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
